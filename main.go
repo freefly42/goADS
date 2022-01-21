@@ -15,9 +15,10 @@ import (
 )
 
 type Connection struct {
-	ip    string
-	netid string
-	port  uint16
+	ip    		string
+	netid 		string
+	sourceNetid	string
+	port  		uint16
 
 	connection  net.Conn
 	target      AMSAddress
@@ -49,10 +50,10 @@ type AMSAddress struct {
 var buf [1024000]byte
 
 // Connection
-func NewConnection(ip string, netid string, port uint16) (conn *Connection, err error) { /*{{{*/
+func NewConnection(ip string, netid string, sourceNetid string, port uint16) (conn *Connection, err error) { /*{{{*/
 	defer logger.Flush()
 
-	conn = &Connection{ip: ip, netid: netid, port: port}
+	conn = &Connection{ip: ip, netid: netid, sourceNetid: sourceNetid, port: port}
 
 	conn.activeRequests = map[uint32]chan []byte{}
 	conn.activeNotifications = map[uint32]chan []byte{}
@@ -80,10 +81,8 @@ func (conn *Connection) Connect() {
 	conn.target = stringToNetId(conn.netid)
 	conn.target.port = conn.port
 
-	localhost, _, _ := net.SplitHostPort(conn.connection.LocalAddr().String())
-	conn.source = stringToNetId(localhost)
-	conn.source.netid[4] = 1
-	conn.source.netid[5] = 1
+	//localhost, _, _ := net.SplitHostPort(conn.connection.LocalAddr().String())
+	conn.source = stringToNetId(sourceNetid)
 	conn.source.port = 800
 	go reciveWorker(conn)
 	go transmitWorker(conn)
