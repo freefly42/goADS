@@ -82,7 +82,7 @@ func (conn *Connection) Connect() {
 	conn.target.port = conn.port
 
 	//localhost, _, _ := net.SplitHostPort(conn.connection.LocalAddr().String())
-	conn.source = stringToNetId(sourceNetid)
+	conn.source = stringToNetId(conn.sourceNetid)
 	conn.source.port = 800
 	go reciveWorker(conn)
 	go transmitWorker(conn)
