@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/stamp/goADS"
+	"github.com/freefly42/goADS"
 
 	"os"
 	"os/signal"
@@ -28,11 +28,12 @@ func main() {
 	debug := flag.Bool("debug", false, "print debugging messages.")
 	ip := flag.String("ip", "172.16.21.10", "the address to the AMS router")
 	netid := flag.String("netid", "172.16.21.10.1.1", "AMS NetID of the target")
-	intport := flag.Uint("port", 801, "AMS Port of the target")
+	sourceNetid := flag.String("sourceNetid", "127.0.0.1.1.1", "AMS NetID of the source")
+	intport := flag.Uint("port", 851, "AMS Port of the target")
 
 	flag.Parse()
 	port := uint16(*intport)
-	fmt.Println(*debug, *ip, *netid, port) /*}}}*/
+	fmt.Println(*debug, *ip, *netid, *sourceNetid, port) /*}}}*/
 
 	// Start the logger/*{{{*/
 	logger, err := log.LoggerFromConfigAsFile("logconfig.xml")
@@ -42,7 +43,7 @@ func main() {
 	log.ReplaceLogger(logger)
 	goADS.UseLogger(logger) /*}}}*/
 	// Startup the connection/*{{{*/
-	connection, e := goADS.NewConnection(*ip, *netid, port)
+	connection, e := goADS.NewConnection(*ip, *netid, *sourceNetid, port)
 	connection.Connect()
 	defer connection.Close() // Close the connection when we are done
 	if e != nil {
